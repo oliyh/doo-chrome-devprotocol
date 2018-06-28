@@ -40,7 +40,7 @@
 (defn- create-test-page [{:keys [js-test-file] :as opts}]
   (let [test-page (-> js-test-file .getParent (io/file "doo-test.html"))]
     (spit test-page (-> (slurp (io/resource "doo-test.html"))
-                        (string/replace #"__js-test-file__" (.getAbsolutePath js-test-file))))
+                        (string/replace "__js-test-file__" (.getAbsolutePath js-test-file))))
     test-page))
 
 (defn- logging-event-listener [{:keys [doo-message-prefix]}]
@@ -71,7 +71,7 @@
 
       (log/info "Running doo")
       (.evaluate session (-> (slurp (io/resource "doo-shim.js"))
-                             (string/replace #"__doo-message-prefix__" doo-message-prefix)))
+                             (string/replace "__doo-message-prefix__" doo-message-prefix)))
       (finally
         (io/delete-file test-page)))))
 
