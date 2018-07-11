@@ -43,40 +43,43 @@
                         (string/replace "__js-test-file__" (.getAbsolutePath js-test-file))))
     test-page))
 
-(defn- completion-event-listener [completion-promise]
-  (let [test-report (atom {})]
-    (reify EventListener
+(defn on-console-api [f]
+  (reify EventListener
       (onEvent [this event value]
         (when (= Events/RuntimeConsoleAPICalled event)
           (when-let [message (.getValue ^RemoteObject (first (.getArgs ^ConsoleAPICalled value)))]
-            (let [report (condp re-find message
+            (f message))))))
 
-                           #"(\d+) failures, (\d+) errors"
-                           :>> (fn [[_ failure-count error-count]]
-                                 (swap! test-report assoc
-                                        :failures (Integer/parseInt failure-count)
-                                        :errors (Integer/parseInt error-count)))
+(defn- completion-event-listener [completion-promise]
+  (let [test-report (atom {})]
+    (on-console-api
+     (fn [message]
+       (let [report (condp re-find message
 
-                           #"Ran (\d+) tests containing (\d+) assertions"
-                           :>> (fn [[_ test-count assertion-count]]
-                                 (swap! test-report assoc
-                                        :tests (Integer/parseInt test-count)
-                                        :assertions (Integer/parseInt assertion-count)))
+                      #"(\d+) failures, (\d+) errors"
+                      :>> (fn [[_ failure-count error-count]]
+                            (swap! test-report assoc
+                                   :failures (Integer/parseInt failure-count)
+                                   :errors (Integer/parseInt error-count)))
 
-                           @test-report)]
+                      #"Ran (\d+) tests containing (\d+) assertions"
+                      :>> (fn [[_ test-count assertion-count]]
+                            (swap! test-report assoc
+                                   :tests (Integer/parseInt test-count)
+                                   :assertions (Integer/parseInt assertion-count)))
 
-              (when (every? @test-report [:tests :assertions :failures :errors])
-                (deliver completion-promise @test-report)))))))))
+                      @test-report)]
+
+         (when (every? @test-report [:tests :assertions :failures :errors])
+           (deliver completion-promise @test-report)))))))
 
 (defn- logging-event-listener [{:keys [doo-message-prefix]}]
-  (reify EventListener
-    (onEvent [this event value]
-      (when (= Events/RuntimeConsoleAPICalled event)
-        (let [message (.getValue ^RemoteObject (first (.getArgs ^ConsoleAPICalled value)))
-              doo-message (some->> message (re-find (re-pattern (str "(?s)" doo-message-prefix "(.*)"))) second)]
-          (if-not (string/blank? doo-message)
-            (log/info doo-message)
-            (log/debug message)))))))
+  (on-console-api
+   (fn [message]
+     (let [doo-message (some->> message (re-find (re-pattern (str "(?s)" doo-message-prefix "(.*)"))) second)]
+       (if-not (string/blank? doo-message)
+         (log/info doo-message)
+         (log/debug message))))))
 
 (def doo-loaded?
   (reify Predicate
