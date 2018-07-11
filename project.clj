@@ -1,4 +1,4 @@
-(defproject doo-chrome-devprotocol "0.1.0"
+(defproject doo-chrome-devprotocol "0.1.1-SNAPSHOT"
   :description "A doo runner for Chrome using the Chrome Dev Protocol on the JVM"
   :url "https://github.com/oliyh/doo-chrome-devprotocol"
   :license {:name "Eclipse Public License"
