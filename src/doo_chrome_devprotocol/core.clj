@@ -4,7 +4,7 @@
             [clojure.tools.logging :as log])
   (:import [java.io File]
            [java.nio.file Path]
-           [java.util ArrayList]
+           [java.util ArrayList List]
            [java.util.function Predicate]
            [io.webfolder.cdp Launcher]
            [io.webfolder.cdp.session SessionFactory Session]
@@ -15,10 +15,10 @@
 
 (defn with-chrome-session [{:keys [port os chrome-path chrome-args chrome-launch-timeout] :as opts} f]
   (log/info "Launching Chrome")
-  (let [launcher (Launcher. port)
+  (let [launcher (Launcher. ^int port)
         chrome-path (or chrome-path (.findChrome launcher))
         ^SessionFactory session-factory (.launch launcher (.toPath (io/file chrome-path))
-                                                 (ArrayList. chrome-args))]
+                                                 (ArrayList. ^List chrome-args))]
     (try
       (Thread/sleep chrome-launch-timeout)
       (let [^Session session (.create session-factory)]
@@ -37,7 +37,7 @@
         (log/info "Closing Chrome")
         (.kill launcher)))))
 
-(defn- create-test-page [{:keys [js-test-file] :as opts}]
+(defn- ^File create-test-page [{:keys [^File js-test-file] :as opts}]
   (let [test-page (-> js-test-file .getParent (io/file "doo-test.html"))]
     (spit test-page (-> (slurp (io/resource "doo-test.html"))
                         (string/replace "__js-test-file__" (.getAbsolutePath js-test-file))))
