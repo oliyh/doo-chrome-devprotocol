@@ -8,4 +8,25 @@
                  [org.clojure/tools.logging "0.4.1"]]
   :java-source-paths ["src"]
   :javac-options ["-target" "1.8" "-source" "1.8"]
-  :profiles {:dev {:resource-paths ["test-resources"]}})
+  :plugins [[lein-doo "0.1.8"]
+            [lein-cljsbuild "1.1.7"]]
+  :profiles {:dev {:resource-paths ["test-resources"]
+                   :dependencies [[org.clojure/clojurescript "1.9.946"]
+                                  [lein-doo "0.1.8"]]}}
+
+  :cljsbuild {:builds [{:id "passing-tests"
+                        :source-paths ["test-resources/src"]
+                        :compiler {:output-to "target/passing-tests.js"
+                                   :main passing.runner
+                                   :optimizations :simple}}
+
+                       {:id "failing-tests"
+                        :source-paths ["test-resources/src"]
+                        :compiler {:output-to "target/failing-tests.js"
+                                   :main failing.runner
+                                   :optimizations :simple}}]}
+
+  :aliases {"test" ["do"
+                    ["clean"]
+                    ["cljsbuild" "once" "passing-tests" "failing-tests"]
+                    ["test"]]})

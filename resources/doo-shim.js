@@ -15,5 +15,3 @@ doo.runner.set_exit_point_BANG_(function(success) {
 console.log('Invoking doo runner');
 
 doo.runner.run_BANG_();
-
-success;

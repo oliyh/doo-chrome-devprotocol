@@ -10,6 +10,12 @@ A runner for [doo](https://github.com/bensu/doo) which runs tests in Chrome, usi
 (require '[doo-chrome-devprotocol.core :as dc])
 
 (dc/run "path/to/doo-tests.js")
+
+;; => {:success? true
+       :report {:tests 2
+                :assertions 4
+                :failures 0
+                :errors 0}}
 ```
 
 `run` also takes an optional map of options which should be self-explanatory
