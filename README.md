@@ -21,15 +21,16 @@ A runner for [doo](https://github.com/bensu/doo) which runs tests in Chrome, usi
 `run` also takes an optional map of options which should be self-explanatory
 
 ```clojure
-{:port 8899
- :chrome-path "/usr/bin/chromium"
- :chrome-args ["--headless"
-               "--disable-gpu" ;; recommended on windows
-              ]
+{:port                  8899
+ :chrome-path           "/usr/bin/chromium"
+ :chrome-args           ["--headless"
+                         "--disable-gpu" ;; recommended on windows
+                        ]
  :chrome-launch-timeout 5000
- :doo-message-prefix "doo:"
+ :doo-message-prefix    "doo:"
  :document-load-timeout 60000
- :doo-load-timeout 10000}
+ :doo-load-timeout      10000
+ :doo-run-timeout       60000}
 ```
 
 ## Development
