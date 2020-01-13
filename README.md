@@ -33,6 +33,22 @@ A runner for [doo](https://github.com/bensu/doo) which runs tests in Chrome, usi
  :doo-run-timeout       60000}
 ```
 
+## Integration with clojure.test
+
+```clojure
+(ns my-project.runner
+  (:require [doo-chrome-devprotocol.core :as dc]
+            [clojure.test :refer [deftest is]]))
+
+(def doo-args
+  {:chrome-args ["--headless" "--disable-gpu" "--no-sandbox"]})
+
+(deftest cljs-tests
+  (let [result (dc/run "out/unit-test.js" doo-args)]
+    (is (:success? result) (:report result))))
+
+```
+
 ## Development
 [![CircleCI](https://circleci.com/gh/oliyh/doo-chrome-devprotocol.svg?style=svg)](https://circleci.com/gh/oliyh/doo-chrome-devprotocol)
 
